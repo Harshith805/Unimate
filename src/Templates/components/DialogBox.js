@@ -93,7 +93,7 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
 
   const handleUpdateFormData = () => {
     setIsLoading(true);
-    const { owasp_weakness, ...postData } = { ...formData, owasp: formData.owasp_weakness.join(",") };
+    const { owasp_weakness, ...postData } = { ...formData, owasp: formData.owasp_weakness.map(keys => keys.value).join(",") };
     fetch(`${APIAddress}/api/v1/templates/${postData.id}`,
       {
         method: "PUT",
@@ -187,7 +187,7 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
             PaperComponent={({ children }) => (
               <Paper style={{ background: "rgb(39, 39, 39)" }}>{children}</Paper>
             )}
-            options={["a", "b"]}
+            options={["1", "2"]}
             renderInput={(params) => <TextField {...params} />}
             value={formData?.issue_no}
             onChange={(e, value) => handleChange('issue_no', value)}
