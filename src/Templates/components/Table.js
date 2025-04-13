@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { APIAddress } from '../../ApiVersion';
 
-export default function Table({ open, setOpen, setIsLoading, tableData, setSnackBarInfo, setTableData, formData, setFormData, clickedCreate, setClickedCreate }) {
+export default function Table({ open, setOpen, setIsLoading, setSelectedRowIds, clickedCreatedIssues, setClickedCreatedIssues, formData1, setFormData1, formDummyData, setFormDummyData, tableData, setSnackBarInfo, setTableData, formData, setFormData, clickedCreate, setClickedCreate }) {
   const [rows, setRows] = useState();
 
   useEffect(() => {
@@ -16,7 +16,7 @@ export default function Table({ open, setOpen, setIsLoading, tableData, setSnack
 
   // Handle row click for edit
   const handleCellClick = (params) => {
-    if(params.field !== "Action"){
+    if(params.field !== "Action" && params.field !== "__check__") {
       setOpen(true);
       setFormData({...params.row, threat_scope: params.row?.threat_scope ? params.row?.threat_scope : "Internal Production"});
       setClickedCreate(false);
@@ -95,8 +95,20 @@ export default function Table({ open, setOpen, setIsLoading, tableData, setSnack
           },
         }
         }}
+        checkboxSelection
         pageSizeOptions={[5]}
         onCellClick={handleCellClick}
+        onRowSelectionModelChange={(newSelection) => {
+          setSelectedRowIds(newSelection); // stores selected row IDs
+        }}
+        sx={{
+          '& .MuiCheckbox-root': {
+            color: 'gray', // unchecked color
+          },
+          '& .Mui-checked': {
+            color: 'skyblue !important', // checked/tick color
+          },
+        }}
       />
 
       <DialogBox
@@ -108,6 +120,12 @@ export default function Table({ open, setOpen, setIsLoading, tableData, setSnack
         formData={formData}
         setFormData={setFormData}
         clickedCreate={clickedCreate}
+        clickedCreatedIssues={clickedCreatedIssues}
+        setClickedCreatedIssues={setClickedCreatedIssues}
+        formData1={formData1}
+        setFormData1={setFormData1}
+        formDummyData={formDummyData}
+        setFormDummyData={setFormDummyData}
         handleDeleteRow={handleDeleteRow}
       />
     </Box>
