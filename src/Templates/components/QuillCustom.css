@@ -1,0 +1,15 @@
+
+
+.ql-toolbar .ql-stroke {
+  fill: none;
+  stroke: #AAAFB2;
+}
+
+.ql-toolbar .ql-fill {
+  fill: #AAAFB2;
+  stroke: none;
+}
+
+.ql-toolbar .ql-picker {
+  color: #AAAFB2;
+}

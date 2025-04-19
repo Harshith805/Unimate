@@ -12,6 +12,9 @@ import { Autocomplete, Button, Checkbox, DialogContent, Divider, Paper, TextFiel
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { styled } from '@mui/material/styles';
 import { APIAddress } from '../../ApiVersion';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import './QuillCustom.css';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -84,6 +87,21 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
     }));
 
     setFormData(formDummyData.filter(keys => keys.summary == summary)[0]);
+  };
+
+  const handleFileChange = (event) => {
+    const files = event.target.files[0]; // multiple files
+    let fileName = files.name, fileContent;
+    if((formData?.files || []).map(keys => keys.file_name).includes(fileName)){
+      setSnackBarInfo({ open: true, severity: "warning", message: "File already uploaded" });
+      return;
+    }
+    const reader = new FileReader();
+    reader.readAsDataURL(files);
+    reader.onload = () => {
+      fileContent = reader.result
+      setFormData({...formData, files: [...(formData?.files || []), { file_name: fileName, file_content: fileContent }] });
+    };
   };
 
   const handlePOSTData = () => {
@@ -324,19 +342,7 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
           />
 
           <Typography>Description</Typography>
-          <TextField
-            fullWidth
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&.Mui-focused fieldset": {
-                  borderColor: "#ccc"
-                }
-              }
-            }}
-            multiline
-            rows={4}
-            value={formData?.description} onChange={(e) => handleChange('description', e.target.value)}
-          />
+          <ReactQuill theme="snow" value={formData?.description} onChange={(e) => handleChange('description', e)} />
 
           <Typography>Detection Method</Typography>
           <Autocomplete
@@ -603,20 +609,27 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
           />
 
           {clickedCreatedIssues && <><Button
-            component="label"
-            role={undefined}
-            variant="contained"
-            tabIndex={-1}
-            startIcon={<CloudUploadIcon />}
-            style={{ display: "flex", width: "10%", margin: "10px 0px" }}
-          >
-            Upload files
-            <VisuallyHiddenInput
-              type="file"
-              onChange={(event) => setFileName(event.target.files[0].name)}
-            />
-          </Button>
-            <p>{fileName}</p></>}
+        component="label"
+        role={undefined}
+        variant="contained"
+        startIcon={<CloudUploadIcon />}
+        style={{ display: "flex", width: "20%", margin: "10px 0px" }}
+      >
+        Upload files
+        <VisuallyHiddenInput
+          type="file"
+          multiple
+          onChange={handleFileChange}
+        />
+      </Button>
+
+      <ul>
+        {formData?.files?.map((file, index) => (
+          <li key={index}>
+            {file.file_name}
+          </li>
+        ))}
+      </ul></>}
         </>}
 
       </DialogContent>

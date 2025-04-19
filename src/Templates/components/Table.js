@@ -96,6 +96,7 @@ export default function Table({ open, setOpen, setIsLoading, setSelectedRowIds, 
         }
         }}
         checkboxSelection
+        disableRowSelectionOnClick
         pageSizeOptions={[5]}
         onCellClick={handleCellClick}
         onRowSelectionModelChange={(newSelection) => {

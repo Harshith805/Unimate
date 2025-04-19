@@ -38,7 +38,7 @@ const Templates = () => {
       })
       .then(response => response.json())
       .then(result => {
-        setTableData(result.data.attributes.objects.data.map(keys => keys.attributes));
+        setTableData(result.data.attributes.objects.data.map(keys => ({threat_scope: "Internal Production", ...keys.attributes})));
         setSnackBarInfo({ open: true, severity: "success", message: result.data.attributes.summary });
         setIsLoading(false);
       })
@@ -86,7 +86,6 @@ const Templates = () => {
                 variant="contained"
                 style={{ background: 'green', color: 'white' }}
                 onClick={() => {
-                  console.log(formData)
                   setFormData({});
                   setOpen(prevState => !prevState);
                   setClickedCreate(true);
