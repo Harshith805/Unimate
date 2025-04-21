@@ -5,14 +5,15 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from "@mui/icons-material/Delete";
 import Slide from '@mui/material/Slide';
 import clsx from "clsx";
 import { styles } from '../../Styles/Stylesheet.css';
-import { Autocomplete, Button, Checkbox, DialogContent, Divider, Paper, TextField } from '@mui/material';
+import { Autocomplete, Box, Button, Checkbox, DialogContent, Divider, Paper, TextField } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { styled } from '@mui/material/styles';
 import { APIAddress } from '../../ApiVersion';
-import ReactQuill from 'react-quill';
+// import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './QuillCustom.css';
 
@@ -102,6 +103,13 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
       fileContent = reader.result
       setFormData({...formData, files: [...(formData?.files || []), { file_name: fileName, file_content: fileContent }] });
     };
+  };
+
+  const handleDeleteFile = (indexToDelete) => {
+    setFormData((prev) => ({
+      ...prev,
+      files: prev.files.filter((_, index) => index !== indexToDelete),
+    }));
   };
 
   const handlePOSTData = () => {
@@ -342,7 +350,7 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
           />
 
           <Typography>Description</Typography>
-          <ReactQuill theme="snow" value={formData?.description} onChange={(e) => handleChange('description', e)} />
+          {/* <ReactQuill theme="snow" value={formData?.description} onChange={(e) => handleChange('description', e)} /> */}
 
           <Typography>Detection Method</Typography>
           <Autocomplete
@@ -616,17 +624,32 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
         style={{ display: "flex", width: "20%", margin: "10px 0px" }}
       >
         Upload files
-        <VisuallyHiddenInput
-          type="file"
-          multiple
-          onChange={handleFileChange}
-        />
+        <VisuallyHiddenInput type="file" multiple onChange={handleFileChange} />
       </Button>
 
-      <ul>
+      <ul style={{ padding: 0, listStyle: "none" }}>
         {formData?.files?.map((file, index) => (
           <li key={index}>
-            {file.file_name}
+            <Box
+              sx={{
+                width: "30%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                backgroundColor: "#333333",
+                borderRadius: "8px",
+                padding: "8px 12px",
+                margin: "6px 0",
+              }}
+            >
+              <span>{file.file_name}</span>
+              <IconButton
+                aria-label="delete"
+                onClick={() => handleDeleteFile(index)}
+              >
+                <DeleteIcon color="error" />
+              </IconButton>
+            </Box>
           </li>
         ))}
       </ul></>}

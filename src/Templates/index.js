@@ -42,7 +42,7 @@ const Templates = () => {
         setSnackBarInfo({ open: true, severity: "success", message: result.data.attributes.summary });
         setIsLoading(false);
       })
-  }, [])
+  }, []);
 
   return (
     <Box>

@@ -13,6 +13,7 @@ import AlertDialog from "./Common/AlertDialog";
 import Templates from "./Templates";
 import { fetchToken } from "./Services/AuthService";
 import CoverPage from "./CoverPage";
+import Tasks from "./Tasks";
 
 
 const App = (props) => {
@@ -69,6 +70,7 @@ const App = (props) => {
                   />
                   <Sidebar />
                   <Route exact path="/templates" component={Templates} />
+                  <Route exact path="/tasks" component={Tasks} />
                 </main>
               </Switch>
             </BrowserRouter>
