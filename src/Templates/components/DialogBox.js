@@ -13,9 +13,14 @@ import { Autocomplete, Box, Button, Checkbox, DialogContent, Divider, Paper, Tex
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { styled } from '@mui/material/styles';
 import { APIAddress } from '../../ApiVersion';
-// import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import './QuillCustom.css';
+import { remark } from "remark";
+
+import rehypeParse from "rehype-parse";
+import rehypeRemark from "rehype-remark";
+import remarkStringify from "remark-stringify";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -112,9 +117,20 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
     }));
   };
 
+  const htmlToMarkdown = (htmlText) => {
+    const file = remark()
+      .use(rehypeParse, { emitParseErrors: true, duplicateAttribute: false })
+      .use(rehypeRemark)
+      .use(remarkStringify)
+      .processSync(htmlText);
+  
+    return String(file);
+  }
+
   const handlePOSTData = () => {
     setIsLoading(true);
-    const { owasp_weakness, ...postData } = { ...formData, owasp: formData.owasp_weakness.map(keys => keys.value).join(",") };
+    let { owasp_weakness, ...postData } = { formData, owasp: formData.owasp_weakness.map(keys => keys.value).join(",") };
+    postData.formData.description = htmlToMarkdown(postData.formData.description);
     fetch(`${APIAddress}/api/v1/templates`,
       {
         method: "POST",
@@ -140,15 +156,15 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
     tempFormDummyData = tempFormDummyData.map(keys => {
       if (clickedCreatedIssues?.trigger == "form") {
         if (keys.issue_no == formData.issue_no) {
-          return { ...formData, scanner_detection: [{ value: formData?.scanner_detection }], impact_type: [{ value: formData?.impact_type }], owasp_weakness: formData?.owasp_weakness.map(keys => (keys)) };
+          return { ...formData, scanner_detection: [{ value: formData?.scanner_detection }], impact_type: [{ value: formData?.impact_type }], owasp_weakness: formData?.owasp_weakness.map(keys => (keys)), description: htmlToMarkdown(formData?.description) };
         } else {
-          return { ...keys, scanner_detection: [{ value: keys?.scanner_detection }], impact_type: [{ value: keys?.impact_type }], owasp_weakness: keys?.owasp_weakness.map(keys => (keys)) };
+          return { ...keys, scanner_detection: [{ value: keys?.scanner_detection }], impact_type: [{ value: keys?.impact_type }], owasp_weakness: keys?.owasp_weakness.map(keys => (keys)), description: htmlToMarkdown(keys?.description) };
         }
       } else if (clickedCreatedIssues?.trigger == "table") {
         if (keys.id == formData.id) {
-          return { ...formData, scanner_detection: [{ value: formData?.scanner_detection }], impact_type: [{ value: formData?.impact_type }], owasp_weakness: formData?.owasp_weakness.map(keys => (keys)) };
+          return { ...formData, scanner_detection: [{ value: formData?.scanner_detection }], impact_type: [{ value: formData?.impact_type }], owasp_weakness: formData?.owasp_weakness.map(keys => (keys)), description: htmlToMarkdown(formData?.description) };
         } else {
-          return { ...keys, scanner_detection: [{ value: keys?.scanner_detection }], impact_type: [{ value: keys?.impact_type }], owasp_weakness: keys?.owasp_weakness.map(keys => (keys)) };
+          return { ...keys, scanner_detection: [{ value: keys?.scanner_detection }], impact_type: [{ value: keys?.impact_type }], owasp_weakness: keys?.owasp_weakness.map(keys => (keys)), description: htmlToMarkdown(keys?.description) };
         }
       }
     });
@@ -350,7 +366,7 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
           />
 
           <Typography>Description</Typography>
-          {/* <ReactQuill theme="snow" value={formData?.description} onChange={(e) => handleChange('description', e)} /> */}
+          <ReactQuill theme="snow" value={formData?.description} onChange={(e) => handleChange('description', e)} />
 
           <Typography>Detection Method</Typography>
           <Autocomplete
