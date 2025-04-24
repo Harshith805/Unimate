@@ -98,7 +98,7 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
   const handleFileChange = (event) => {
     const files = event.target.files[0]; // multiple files
     let fileName = files.name, fileContent;
-    if((formData?.files || []).map(keys => keys.file_name).includes(fileName)){
+    if ((formData?.files || []).map(keys => keys.file_name).includes(fileName)) {
       setSnackBarInfo({ open: true, severity: "warning", message: "File already uploaded" });
       return;
     }
@@ -106,7 +106,7 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
     reader.readAsDataURL(files);
     reader.onload = () => {
       fileContent = reader.result
-      setFormData({...formData, files: [...(formData?.files || []), { file_name: fileName, file_content: fileContent }] });
+      setFormData({ ...formData, files: [...(formData?.files || []), { file_name: fileName, file_content: fileContent }] });
     };
   };
 
@@ -123,7 +123,7 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
       .use(rehypeRemark)
       .use(remarkStringify)
       .processSync(htmlText);
-  
+
     return String(file);
   }
 
@@ -168,24 +168,45 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
         }
       }
     });
-    
+
     var postData = { bulk_create: { ...formData1, issues: tempFormDummyData } };
-    fetch(`${APIAddress}/api/v1/bulk_create`,
-      {
-        method: "POST",
-        body: JSON.stringify(postData),
-        headers: {
-          "Authorization": "eyJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl9pZCI6MiwiZXhwIjoxNzYwOTgwNDgxfQ.x6HpeiH-3U5girByflMR0pskpAOPFT-NNPcNQR6R3tg",
-          "Content-Type": "application/json",
-          "ngrok-skip-browser-warning": "69420",
+
+    fetch(`${APIAddress}/api/v1/bulk_create`, {
+      method: "POST",
+      body: JSON.stringify(postData),
+      headers: {
+        "Authorization": "eyJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl9pZCI6MiwiZXhwIjoxNzYwOTgwNDgxfQ.x6HpeiH-3U5girByflMR0pskpAOPFT-NNPcNQR6R3tg",
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "69420",
+      }
+    })
+      .then(async (response) => {
+        const result = await response.json();
+        if (response.status === 200) {
+          setSnackBarInfo({
+            open: true,
+            severity: "success",
+            message: "Success",
+          });
+          setOpen(false);
+        } else {
+          setSnackBarInfo({
+            open: true,
+            severity: "error",
+            message: "Something went wrong",
+          });
         }
-      })
-      .then(response => response.json())
-      .then(result => {
-        setSnackBarInfo({ open: true, severity: "success", message: result.data.attributes.summary });
-        setOpen(false);
         setIsLoading(false);
       })
+      .catch((error) => {
+        setSnackBarInfo({
+          open: true,
+          severity: "error",
+          message: error.message || "Network error",
+        });
+        setOpen(false);
+        setIsLoading(false);
+      });
   };
 
   const handleUpdateFormData = () => {
@@ -634,42 +655,42 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
           />
 
           {clickedCreatedIssues && <><Button
-        component="label"
-        role={undefined}
-        variant="contained"
-        startIcon={<CloudUploadIcon />}
-        style={{ display: "flex", width: "20%", margin: "10px 0px" }}
-      >
-        Upload files
-        <VisuallyHiddenInput type="file" multiple onChange={handleFileChange} />
-      </Button>
+            component="label"
+            role={undefined}
+            variant="contained"
+            startIcon={<CloudUploadIcon />}
+            style={{ display: "flex", width: "20%", margin: "10px 0px" }}
+          >
+            Upload files
+            <VisuallyHiddenInput type="file" multiple onChange={handleFileChange} />
+          </Button>
 
-      <ul style={{ padding: 0, listStyle: "none" }}>
-        {formData?.files?.map((file, index) => (
-          <li key={index}>
-            <Box
-              sx={{
-                width: "30%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                backgroundColor: "#333333",
-                borderRadius: "8px",
-                padding: "8px 12px",
-                margin: "6px 0",
-              }}
-            >
-              <span>{file.file_name}</span>
-              <IconButton
-                aria-label="delete"
-                onClick={() => handleDeleteFile(index)}
-              >
-                <DeleteIcon color="error" />
-              </IconButton>
-            </Box>
-          </li>
-        ))}
-      </ul></>}
+            <ul style={{ padding: 0, listStyle: "none" }}>
+              {formData?.files?.map((file, index) => (
+                <li key={index}>
+                  <Box
+                    sx={{
+                      width: "30%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      backgroundColor: "#333333",
+                      borderRadius: "8px",
+                      padding: "8px 12px",
+                      margin: "6px 0",
+                    }}
+                  >
+                    <span>{file.file_name}</span>
+                    <IconButton
+                      aria-label="delete"
+                      onClick={() => handleDeleteFile(index)}
+                    >
+                      <DeleteIcon color="error" />
+                    </IconButton>
+                  </Box>
+                </li>
+              ))}
+            </ul></>}
         </>}
 
       </DialogContent>
