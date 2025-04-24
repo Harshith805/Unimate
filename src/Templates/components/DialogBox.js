@@ -129,8 +129,8 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
 
   const handlePOSTData = () => {
     setIsLoading(true);
-    let { owasp_weakness, ...postData } = { formData, owasp: formData.owasp_weakness.map(keys => keys.value).join(",") };
-    postData.formData.description = htmlToMarkdown(postData.formData.description);
+    let { owasp_weakness, ...postData } = { ...formData, owasp: formData.owasp_weakness.map(keys => keys.value).join(",") };
+    postData.description = htmlToMarkdown(postData.description);
     fetch(`${APIAddress}/api/v1/templates`,
       {
         method: "POST",
@@ -191,6 +191,7 @@ const DialogBox = ({ open, formData, setFormData, setTableData, setSnackBarInfo,
   const handleUpdateFormData = () => {
     setIsLoading(true);
     const { owasp_weakness, ...postData } = { ...formData, owasp: formData.owasp_weakness.map(keys => keys.value).join(",") };
+    postData.description = htmlToMarkdown(postData.description);
     fetch(`${APIAddress}/api/v1/templates/${postData.id}`,
       {
         method: "PUT",
